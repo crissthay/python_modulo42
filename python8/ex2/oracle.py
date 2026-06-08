@@ -3,46 +3,40 @@ import os
 
 load_dotenv()
 
+mode = os.getenv("MATRIX_MODE", "development")
+database = os.getenv("DATABASE_URL")
+api_key = os.getenv("API_KEY")
+log_level = os.getenv("LOG_LEVEL", "DEBUG")
+zion = os.getenv("ZION_ENDPOINT")
+
 print("ORACLE STATUS: Reading the Matrix...\n")
 print("Configuration loaded:")
-name = os.getenv("MATRIX_MODE")
-if name == "production":
-    print("Mode: production")
+print(f"Mode: {mode}")
+
+if database:
+    print("Database: Connected")
 else:
-    print("Mode: development")
-data = os.getenv("DATABASE_URL")
-if data:
-    print("Database: Connected to local instance")
-else:
-    print("Database: Desconect")
-api = os.getenv("API_KEY")
-if api:
+    print("Database: Not configured")
+
+if api_key:
     print("API Access: Authenticated")
 else:
     print("API Access: Not authenticated")
-print("Log Acess:", os.getenv("LOG_LEVEL"))
-zion = os.getenv("ZION_ENDPOINT")
+
+print(f"Log Level: {log_level}")
+
 if zion:
     print("Zion Network: Online")
 else:
     print("Zion Network: Offline")
 
 print("\nEnvironment security check:")
-if api is not None:
-    print("[OK] No hardcoded secrets detected")
-else:
-    print("[WARNING] Hardcoded secrets detected")
-env = os.path.exists(".env")
-if env:
+print("[OK] No hardcoded secrets detected")
+
+if os.path.exists(".env"):
     print("[OK] .env file properly configured")
 else:
     print("[WARNING] .env file not configured")
-if name:
-    print("[OK] Production overrides available")
-else:
-    print("[WARNING] Production overrides inavailable")
 
+print("[OK] Production overrides available")
 print("\nThe Oracle sees all configurations.")
-
-
-    

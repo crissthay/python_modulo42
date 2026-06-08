@@ -1,11 +1,16 @@
-[project] 
+[tool.poetry]
 name = "ex1"
 version = "0.1.0"
-description = "my project python"
-authors = [{name = "thay"}]
-requires-python = ">=3.10"
+description = "Matrix data loading exercise"
+authors = ["thay"]
+package-mode = false
 
-dependencies = []
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.2.2"
+numpy = "^1.26.4"
+matplotlib = "^3.8.4"
+requests = "^2.34.2"
 
 [build-system]
 requires = ["poetry-core"]

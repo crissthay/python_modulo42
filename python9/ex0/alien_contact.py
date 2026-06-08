@@ -1,6 +1,8 @@
+import json
 from pydantic import BaseModel, Field, ValidationError
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
+
 
 class SpaceStation(BaseModel):
     station_id: str = Field(min_length=3, max_length=10)
@@ -13,48 +15,43 @@ class SpaceStation(BaseModel):
     notes: Optional[str] = Field(default=None, max_length=200)
 
 
-def main():
-    print("OMEGAVERSE")
-    print("=" * 30)
-    validate_stations = SpaceStation(
-        station_id="ISS001",
-        name="Omega TaeRae",
-        crew_size=20,
-        power_level=85.5,
-        oxygen_level=92.3,
-        last_maintenance=datetime.now(),
-        is_operational=True,
-        notes="ALIEN KIM TAERAE"
-    )
-    
-    print("Valid station created:")
-    print("ID:", validate_stations.station_id)
-    print("Name:", validate_stations.name)
-    print(f"Crew: {validate_stations.crew_size} People")
-    print(f"Power: {validate_stations.power_level}%")
-    print(f"Oxygen: {validate_stations.oxygen_level}%")
-    print("Data:", validate_stations.last_maintenance)
-    if validate_stations.is_operational is True:
-        print("Status: Operational")
-    else:
-        print("Status: Not operational")
-    if validate_stations.notes:
-        print("Note:", validate_stations.notes)
-    print("=" * 30)
-    print()
-
+def load_json(path: str) -> list[dict[str, Any]]:
     try:
-        _ = SpaceStation(
-        station_id="ERR001",
-        name="Omega TaeRae SAD",
-        crew_size=25,
-        power_level=66.5,
-        oxygen_level=66.3,
-        last_maintenance=datetime.now(),
+        with open(path) as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"Error: '{path}' not found")
+        return []
+    except json.JSONDecodeError as e:
+        print(f"Error: invalid JSON in '{path}' - {e}")
+        return []
+
+
+def main() -> None:
+    records = load_json("space_stations.json") + load_json(
+        "invalid_stations.json"
     )
-    except ValidationError as e:
-        print("Expected validation error:")
-        print(e)
+    print("Space Station Data Validation")
+    for record in records:
+        try:
+            station = SpaceStation.model_validate(record)
+            print("=" * 50)
+            print("Valid station created:")
+            print(f"ID: {station.station_id}")
+            print(f"Name: {station.name}")
+            print(f"Crew: {station.crew_size} people")
+            print(f"Power:z {station.power_level}%")
+            print(f"Oxygen: {station.oxygen_level}%")
+            print(
+                f"Status: "
+                f"{'Operational' if station.is_operational else 'Offline'}"
+            )
+            print()
+        except ValidationError as e:
+            print("=" * 50)
+            print("Expected validation error:")
+            print(e.errors()[0]["n"])
+            print()
 
 
 if __name__ == '__main__':
